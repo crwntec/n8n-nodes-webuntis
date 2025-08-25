@@ -1,48 +1,140 @@
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
+# n8n-nodes-WebUntis
 
-# n8n-nodes-starter
+This is an n8n community node. It lets you use WebUntis in your n8n workflows.
 
-This repo contains example nodes to help you get started building your own custom integrations for [n8n](https://n8n.io). It includes the node linter and other dependencies.
+WebUntis is a popular service for school timetables and schedule management used by educational institutions worldwide.
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-If you would like your node to be available on n8n cloud you can also [submit your node for verification](https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/).
+[Installation](#installation)  
+[Operations](#operations)  
+[Credentials](#credentials)  
+[Compatibility](#compatibility)  
+[Usage](#usage)  
+[Resources](#resources)  
+[Version history](#version-history)  
 
-## Prerequisites
+## Installation
 
-You need the following installed on your development machine:
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
-* [git](https://git-scm.com/downloads)
-* Node.js and npm. Minimum version Node 20. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-  ```
-  npm install n8n -g
-  ```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+To install this community node, use the following package name:
+```
+n8n-nodes-webuntis
+```
 
-## Using this starter
+## Operations
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+The WebUntis node supports the following operations:
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
-   ```
-   git clone https://github.com/<your organization>/<your-repo-name>.git
-   ```
-3. Run `npm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Run `npm run lint` to check for errors or `npm run lintfix` to automatically fix errors when possible.
-8. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-9. Replace this README with documentation for your node. Use the [README_TEMPLATE](README_TEMPLATE.md) to get started.
-10. Update the LICENSE file to use your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
+### Timetable
+- **Get Week**: Retrieve timetable data for a specific week
+- **Get Timeframe**: Retrieve timetable data for multiple weeks (with configurable lookback period)
 
-## More information
+### Teachers
+- **Get All**: Retrieve a list of all teachers with their IDs and names
 
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
+### Rooms
+- **Get All**: Retrieve a list of all rooms with their IDs, names, and long names
 
-## License
+### Subjects
+- **Get All**: Retrieve a list of all subjects with their IDs, names, and long names
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+## Credentials
+
+To use this node, you need to create WebUntis API credentials in n8n with the following information:
+
+### Prerequisites
+- You must have a valid WebUntis account with access to your school's timetable system
+- Your account must have appropriate permissions to access timetable data
+
+### Setting up credentials
+1. In n8n, go to **Credentials** and create a new **WebUntis API** credential
+2. Enter your WebUntis login credentials:
+   - **Username**: Your WebUntis username
+   - **Password**: Your WebUntis password
+
+### Important Notes
+- The node is currently configured for the "st-bernhard-gym" school. For other schools, you may need to modify the school parameter in the code
+- Credentials are securely stored and encrypted by n8n
+
+## Compatibility
+
+- **Minimum n8n version**: 0.198.0
+- **Tested with n8n versions**: 0.198.0+
+- **Node.js compatibility**: Node.js 16+
+
+### Known Limitations
+- Currently hardcoded for "st-bernhard-gym" school - customization needed for other schools
+- Requires WebUntis server to support the specific API endpoints used
+- Some WebUntis installations may have different API structures
+
+## Usage
+
+### Basic Timetable Retrieval
+1. Add the WebUntis node to your workflow
+2. Select **Timetable** as the resource
+3. Choose **Get Week** operation
+4. Set the date parameter (leave empty for current week)
+5. Configure your WebUntis credentials
+
+### Getting Multiple Weeks
+1. Select **Timetable** resource and **Get Timeframe** operation
+2. Set the **Look Back Weeks** parameter to specify how many weeks to retrieve
+3. The node will return combined data from multiple weeks
+
+### Teacher/Room/Subject Information
+1. Select the appropriate resource (Teachers, Rooms, or Subjects)
+2. The operation will automatically be set to **Get All**
+3. The node will return all available items of the selected type
+
+### Advanced Options
+- **User ID**: Leave empty to use the authenticated user's timetable, or specify a different user ID
+- **Date**: Use YYYY-MM-DD format or n8n's date picker
+
+### Output Data Structure
+
+**Timetable data includes:**
+- Lesson details (start time, end time, date)
+- Teacher information (including substitution teachers)
+- Subject and room assignments
+- Special flags (substitution, cancellation, free periods, etc.)
+
+**Teachers/Rooms/Subjects include:**
+- ID numbers for API references
+- Display names
+- Long names (where applicable)
+
+### Error Handling
+The node handles common errors such as:
+- Authentication failures (403 errors)
+- No data available (204 errors)
+- Network connectivity issues
+
+## Resources
+
+- [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
+- [WebUntis Official Website](https://webuntis.com/)
+- [WebUntis API Documentation](https://help.untis.at/hc/en-us/articles/360016560358-WebUntis-API-documentation)
+- [n8n workflow automation platform](https://n8n.io/)
+
+## Version history
+
+### 1.0.0
+- Initial release
+- Support for timetable retrieval (single week and multiple weeks)
+- Support for teachers, rooms, and subjects data
+- Authentication via WebUntis credentials
+- Error handling for common API issues
+- Compatible with n8n 0.198.0+
+
+### Known Issues
+- School parameter is currently hardcoded - future versions will support multiple schools
+- Limited to specific WebUntis server configurations
+- Some advanced WebUntis features not yet supported
+
+### Planned Features
+- Multi-school support with configurable school parameters
+- Support for additional WebUntis data types (classes, holidays, etc.)
+- Enhanced filtering and search capabilities
+- Caching support for improved performance
