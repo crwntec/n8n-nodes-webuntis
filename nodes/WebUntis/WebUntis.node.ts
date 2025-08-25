@@ -129,19 +129,6 @@ export class WebUntis implements INodeType {
 				description: 'Number of weeks to look ahead from the specified date',
 			},
 			{
-				displayName: 'User ID',
-				name: 'userID',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: ['timetable'],
-					},
-				},
-				default: '',
-				description:
-					'Optional: Specific user ID to get timetable for (leave empty to use authenticated user)',
-			},
-			{
 				displayName: 'School Name',
 				name: 'schoolName',
 				type: 'string',
@@ -185,7 +172,7 @@ export class WebUntis implements INodeType {
                         responseData = await getData(date, lookAhead, sessionID, userID, schoolName, holidays);
                     }
                 } else {
-                    const sampleData = await getData(moment().format('YYYY-MM-DD'), 1, sessionID, userID, schoolName, holidays);
+                    const sampleData = await getData(moment().format('YYYY-MM-DD'), 2, sessionID, userID, schoolName, holidays);
 					if (resource == 'teachers') {
 						responseData = sampleData && sampleData.data ? sampleData.data.teachers : [];
 					} else if (resource == 'rooms') {

@@ -355,9 +355,30 @@ export const getData = async (date: string, lookAhead: number, sessionID: string
 		status: 200,
 		data: {
 			lessons: combineToBlocks(combinedLessons, holidays),
-			teachers: getTeachers(filteredResponses[0]?.data.data.result.data),
-			rooms: getRooms(filteredResponses[0]?.data.data.result.data),
-			subjects: getSubjects(filteredResponses[0]?.data.data.result.data),
+			teachers: getTeachers(
+				{
+					...filteredResponses[0]?.data.data.result.data,
+					elements: filteredResponses
+						.filter((r) => r && r.data && r.data.data && r.data.data.result && r.data.data.result.data)
+						.flatMap((r) => r?.data.data.result.data.elements)
+				}
+			),
+			rooms: getRooms(
+				{
+					...filteredResponses[0]?.data.data.result.data,
+					elements: filteredResponses
+						.filter((r) => r && r.data && r.data.data && r.data.data.result && r.data.data.result.data)
+						.flatMap((r) => r?.data.data.result.data.elements)
+				}
+			),
+			subjects: getSubjects(
+				{
+					...filteredResponses[0]?.data.data.result.data,
+					elements: filteredResponses
+						.filter((r) => r && r.data && r.data.data && r.data.data.result && r.data.data.result.data)
+						.flatMap((r) => r?.data.data.result.data.elements)
+				}
+			),
 		},
 	};
 };
