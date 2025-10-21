@@ -166,13 +166,13 @@ export class WebUntis implements INodeType {
 				if (resource === 'timetable') {
 					const date = this.getNodeParameter('date', i) as string;
 					if (operation == 'getWeek') {
-						responseData = await getData(date, 1, sessionID, userID, schoolName, holidays);
+						responseData = await getData(date, 1, sessionID, userID, schoolName, holidays, baseURL);
                     } else if (operation == 'getTimeframe') {
                         const lookAhead = this.getNodeParameter('lookAhead', i) as number;
-                        responseData = await getData(date, lookAhead, sessionID, userID, schoolName, holidays);
+                        responseData = await getData(date, lookAhead, sessionID, userID, schoolName, holidays, baseURL);
                     }
                 } else {
-                    const sampleData = await getData(moment().format('YYYY-MM-DD'), 2, sessionID, userID, schoolName, holidays);
+                    const sampleData = await getData(moment().format('YYYY-MM-DD'), 2, sessionID, userID, schoolName, holidays, baseURL);
 					if (resource == 'teachers') {
 						responseData = sampleData && sampleData.data ? sampleData.data.teachers : [];
 					} else if (resource == 'rooms') {
