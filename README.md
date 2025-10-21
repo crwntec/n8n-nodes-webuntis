@@ -116,6 +116,12 @@ The node handles common errors such as:
 
 ### 1.0.0
 - Initial release
+- Support for timetable retrieval (single week and multiple weeks)
+- Support for teachers, rooms, and subjects data
+- Authentication via WebUntis credentials
+- Error handling for common API issues
+- Compatible with n8n 0.198.0+
+
 
 ### Planned Features
 - Support for additional WebUntis data types (classes, holidays, etc.)
