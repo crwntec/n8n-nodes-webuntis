@@ -55,7 +55,6 @@ To use this node, you need to create WebUntis API credentials in n8n with the fo
    - **Password**: Your WebUntis password
 
 ### Important Notes
-- The node is currently configured for the "st-bernhard-gym" school. For other schools, you may need to modify the school parameter in the code
 - Credentials are securely stored and encrypted by n8n
 
 ## Compatibility
@@ -63,11 +62,6 @@ To use this node, you need to create WebUntis API credentials in n8n with the fo
 - **Minimum n8n version**: 0.198.0
 - **Tested with n8n versions**: 0.198.0+
 - **Node.js compatibility**: Node.js 16+
-
-### Known Limitations
-- Currently hardcoded for "st-bernhard-gym" school - customization needed for other schools
-- Requires WebUntis server to support the specific API endpoints used
-- Some WebUntis installations may have different API structures
 
 ## Usage
 
@@ -128,13 +122,8 @@ The node handles common errors such as:
 - Error handling for common API issues
 - Compatible with n8n 0.198.0+
 
-### Known Issues
-- School parameter is currently hardcoded - future versions will support multiple schools
-- Limited to specific WebUntis server configurations
-- Some advanced WebUntis features not yet supported
 
 ### Planned Features
-- Multi-school support with configurable school parameters
 - Support for additional WebUntis data types (classes, holidays, etc.)
 - Enhanced filtering and search capabilities
 - Caching support for improved performance

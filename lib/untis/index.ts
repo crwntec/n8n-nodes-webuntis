@@ -102,9 +102,9 @@ interface Lesson {
 interface Block extends Lesson {
 	isInHoliday: boolean;
 }
-export const makeRequest = (date: string, sessionID: any, userID: number, schoolID: any) => {
+export const makeRequest = (date: string, sessionID: any, userID: number, schoolID: any, baseURL: string) => {
 	if (!userID || !sessionID) return;
-	return axios.get('https://niobe.webuntis.com/WebUntis/api/public/timetable/weekly/data', {
+	return axios.get(baseURL + '/WebUntis/api/public/timetable/weekly/data', {
 		params: {
 			elementType: 5,
 			elementId: userID,
@@ -309,7 +309,7 @@ function getLessonsForWeek(data: RawUntisDataT): Lesson[] {
 	return lessons;
 }
 
-export const getData = async (date: string, lookAhead: number, sessionID: string, userID: number, schoolID: string, holidays: any[][]) => {
+export const getData = async (date: string, lookAhead: number, sessionID: string, userID: number, schoolID: string, holidays: any[][], baseURL: string) => {
 	if (!sessionID) {
 		throw new Error('No sessionID');
 		return;
@@ -322,7 +322,7 @@ export const getData = async (date: string, lookAhead: number, sessionID: string
 		dates.push(d);
 	}
 	const untisDates = dates.map((d) => convertToUntisDate(d));
-	const promises = untisDates.map((d) => makeRequest(d, sessionID, userID, schoolID));
+	const promises = untisDates.map((d) => makeRequest(d, sessionID, userID, schoolID, baseURL));
 	const responses = await axios.all(promises).catch((error) => {
 		if (error.response) {
 			// The request was made and the server responded with a status code
