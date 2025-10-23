@@ -17,7 +17,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          token: ${{ secrets.PAT_TOKEN }}
           fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
@@ -31,9 +30,8 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           echo "version=$(npm version patch -m "chore: Bump version to %s")" >> $GITHUB_OUTPUT
       - name: Push changes
-        run: |
-          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git
-          git push --follow-tags
+        run: git push --follow-tags
+  
   publish:
     needs: version
     runs-on: ubuntu-latest
