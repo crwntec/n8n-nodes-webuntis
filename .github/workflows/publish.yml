@@ -32,7 +32,11 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           echo "version=$(npm version patch -m "chore: Bump version to %s")" >> $GITHUB_OUTPUT
       - name: Push changes
-        run: git push --follow-tags
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.event.pull_request.base.ref }}
+          tags: true
 
   publish:
     needs: version
