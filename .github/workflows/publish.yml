@@ -6,6 +6,8 @@ on:
     branches:
       - main
       - master
+permissions:
+  contents: write
 jobs:
   version:
     if: github.event.pull_request.merged == true
@@ -31,7 +33,7 @@ jobs:
           echo "version=$(npm version patch -m "chore: Bump version to %s")" >> $GITHUB_OUTPUT
       - name: Push changes
         run: git push --follow-tags
-  
+
   publish:
     needs: version
     runs-on: ubuntu-latest
