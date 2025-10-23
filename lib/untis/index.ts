@@ -132,24 +132,34 @@ export async function getInfo(
 	});
 	const loginResponse = await axios.post(baseURL + '/WebUntis/j_spring_security_check', data, {
 		headers: {
-			Accept: 'application/json',
+			'Accept': 'application/json',
 			'Content-Type': 'application/x-www-form-urlencoded',
 		},
+		validateStatus: () => true, // handle errors manually
 	});
-	const sessionID = loginResponse.headers['set-cookie']![0].split(';')[0].split('=')[1].trim();
-	const schoolID = loginResponse.headers['set-cookie']![1].split(';')[0].split('=')[1].trim();
-	const tokenResponse = await axios.get(baseURL + '/WebUntis/api/token/new', {
-		headers: {
-			Accept: 'application/json, text/plain, */*',
-			cookie: `JSESSIONID=${sessionID}; schoolname=^^${schoolID}^^`,
-		},
-		withCredentials: true,
-	});
-	const token = tokenResponse.data;
+
+	if (loginResponse.status !== 200 || !loginResponse.data.result) {
+		const error = loginResponse.data.error?.message || 'Login failed';
+		throw new Error(error);
+	}
+
+	const sessionID = loginResponse.data.result.sessionId;
+	const token = loginResponse.data.result.token;
+
+	const cookies = loginResponse.headers['set-cookie'];
+	if (!cookies) {
+		throw new Error('Login failed: No cookies received.');
+	}
+	const schoolCookie = cookies.find(c => c.startsWith('schoolname='));
+	if (!schoolCookie) {
+		throw new Error('Login failed: Missing schoolname cookie.');
+	}
+	const schoolID = schoolCookie.split(';')[0].split('=')[1].trim();
+
 	const appDataResponse = await axios.get(baseURL + '/WebUntis/api/rest/view/v1/app/data', {
 		headers: {
-			Accept: 'application/json, text/plain, */*',
-			Authorization: `Bearer ${token}`,
+			'Accept': 'application/json, text/plain, */*',
+			'Authorization': `Bearer ${token}`,
 		},
 		withCredentials: true,
 	});
@@ -166,9 +176,9 @@ export async function getInfo(
 				isMyTimetableSelected: true,
 			},
 			headers: {
-				Accept: 'application/json, text/plain, */*',
-				Authorization: `Bearer ${token}`,
-				cookie: `JSESSIONID=${sessionID}; schoolname=^^${schoolID}^^`,
+				'Accept': 'application/json, text/plain, */*',
+				'Authorization': `Bearer ${token}`,
+				'cookie': `JSESSIONID=${sessionID}; schoolname=^^${schoolID}^^`,
 			},
 		},
 	);
