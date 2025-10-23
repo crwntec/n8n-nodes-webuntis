@@ -322,7 +322,7 @@ export const getData = async (date: string, lookAhead: number, sessionID: string
 		dates.push(d);
 	}
 	const untisDates = dates.map((d) => convertToUntisDate(d));
-	const promises = untisDates.map((d) => makeRequest(d, sessionID, userID, schoolID, baseURL));
+	const promises = untisDates.map((d) => makeRequest(d, sessionID, userID, schoolID, baseURL)).filter((p): p is NonNullable<typeof p> => !!p);
 	const responses = await axios.all(promises).catch((error) => {
 		if (error.response) {
 			// The request was made and the server responded with a status code
@@ -342,11 +342,19 @@ export const getData = async (date: string, lookAhead: number, sessionID: string
 	if (responses.some((response) => response?.status === 403)) {
 		return { status: responses[0]?.status, data: null };
 	}
-	let combinedLessons: any = responses.map((response) =>
-		getLessonsForWeek(response?.data.data.result.data),
+	const validResponses = responses.filter(
+		(r) => r && r.data && r.data.data && r.data.data.result && r.data.data.result.data,
+	);
+	if (validResponses.length === 0) {
+		return { status: 500, data: null };
+	}
+	let combinedLessons: any = validResponses.map((response) =>
+		getLessonsForWeek(response.data.data.result.data),
 	);
 	combinedLessons = ([] as Lesson[]).concat(...combinedLessons);
-	let filteredResponses = responses.filter((r) => r?.data.data.result.data.elements.length > 1);
+	let filteredResponses = validResponses.filter(
+		(r) => r.data.data.result.data.elements.length > 1,
+	);
 	if (filteredResponses.length == 0) {
 		return { status: 500, data: null };
 	}
@@ -357,26 +365,23 @@ export const getData = async (date: string, lookAhead: number, sessionID: string
 			lessons: combineToBlocks(combinedLessons, holidays),
 			teachers: getTeachers(
 				{
-					...filteredResponses[0]?.data.data.result.data,
+					...filteredResponses[0].data.data.result.data,
 					elements: filteredResponses
-						.filter((r) => r && r.data && r.data.data && r.data.data.result && r.data.data.result.data)
-						.flatMap((r) => r?.data.data.result.data.elements)
+						.flatMap((r) => r.data.data.result.data.elements)
 				}
 			),
 			rooms: getRooms(
 				{
-					...filteredResponses[0]?.data.data.result.data,
+					...filteredResponses[0].data.data.result.data,
 					elements: filteredResponses
-						.filter((r) => r && r.data && r.data.data && r.data.data.result && r.data.data.result.data)
-						.flatMap((r) => r?.data.data.result.data.elements)
+						.flatMap((r) => r.data.data.result.data.elements)
 				}
 			),
 			subjects: getSubjects(
 				{
-					...filteredResponses[0]?.data.data.result.data,
+					...filteredResponses[0].data.data.result.data,
 					elements: filteredResponses
-						.filter((r) => r && r.data && r.data.data && r.data.data.result && r.data.data.result.data)
-						.flatMap((r) => r?.data.data.result.data.elements)
+						.flatMap((r) => r.data.data.result.data.elements)
 				}
 			),
 		},
