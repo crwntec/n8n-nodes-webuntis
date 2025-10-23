@@ -31,7 +31,9 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           echo "version=$(npm version patch -m "chore: Bump version to %s")" >> $GITHUB_OUTPUT
       - name: Push changes
-        run: git push --follow-tags
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git
+          git push --follow-tags
   publish:
     needs: version
     runs-on: ubuntu-latest
