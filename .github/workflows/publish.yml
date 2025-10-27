@@ -6,57 +6,49 @@ on:
     branches:
       - main
       - master
+
 permissions:
   contents: write
-jobs:
-  version:
-    if: github.event.pull_request.merged == true
-    permissions:
-      contents: write
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.version.outputs.version }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '20.x'
-      - name: Install dependencies
-        run: npm ci
-      - name: Bump version
-        id: version
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          echo "version=$(npm version patch -m "chore: Bump version to %s")" >> $GITHUB_OUTPUT
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.PAT_TOKEN }}
-          branch: ${{ github.event.pull_request.base.ref }}
-          tags: true
+  packages: write 
 
+jobs:
   publish:
-    needs: version
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.base.ref }}
           fetch-depth: 0
-      - name: Pull latest changes
-        run: git pull origin ${{ github.event.pull_request.base.ref }}
-      - uses: actions/setup-node@v3
+          
+      - uses: actions/setup-node@v4
         with:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
-      - name: Install dependencies
-        run: npm ci
-      - name: Build
-        run: npm run build
-      - name: Publish
-        run: npm publish
+
+      - name: Publish package
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm ci
+          
+          npm run build
+
+          npm version patch --no-git-tag-version
+          VERSION=$(node -p 'require("./package.json").version')
+          echo $VERSION
+
+          if npm view $(node -p 'require("./package.json").name')@${VERSION} > /dev/null 2>&1; then
+            echo Version $VERSION already exists on npm. Skipping publish.
+            exit 0
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add package.json package-lock.json || true 
+          git commit -m "chore(release): v$VERSION" || true
+          git tag v$VERSION
+
+          npm publish
+
+          git push origin ${{ github.event.pull_request.base.ref }} --follow-tags
