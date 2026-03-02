@@ -1,5 +1,7 @@
 # n8n-nodes-WebUntis
 
+# WARNING THIS PROJECT IS DEPRECATED AND NO LONGER MAINTAINED AS WEBUNTIS CHANGED TO THEIR API.
+
 This is an n8n community node. It lets you use WebUntis in your n8n workflows.
 
 WebUntis is a popular service for school timetables and schedule management used by educational institutions worldwide.
